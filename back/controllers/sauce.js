@@ -80,6 +80,11 @@ const manageLikes = (likeCode, userId, usersLiked, usersDisliked) => {
 exports.createSauce = (req, res, next) => {
   const sauceObject = JSON.parse(req.body.sauce)
   delete sauceObject._id
+  if (sauceObject.userId != req.auth.userId) {
+    res.status(401).json({
+      error: new Error("Invalid request!"),
+    })
+  }
   const sauce = new Sauce({
     ...sauceObject,
     imageUrl: `${req.protocol}://${req.get("host")}/images/${
@@ -111,6 +116,13 @@ exports.getOneSauce = (req, res, next) => {
 }
 
 exports.updateSauce = (req, res, next) => {
+  if (req.file) {
+    if (JSON.parse(req.body.sauce).userId != req.auth.userId) {
+      res.status(401).json({
+        error: new Error("Invalid request!"),
+      })
+    }
+  }
   const sauceObject = req.file
     ? {
         ...JSON.parse(req.body.sauce),
@@ -128,7 +140,7 @@ exports.updateSauce = (req, res, next) => {
 }
 
 exports.deleteSauce = (req, res, next) => {
-  Sauce.findOne({ _id: req.params.id }) //mettre plusieurs conditions pour chercher avec l'user IDd
+  Sauce.findOne({ _id: req.params.id, userId: req.auth.userId })
 
     .then((sauce) => {
       if (!sauce) {
@@ -136,12 +148,6 @@ exports.deleteSauce = (req, res, next) => {
           error: new Error("No such Sauce!"),
         })
       }
-      if (sauce.userId !== req.auth.userId) {
-        res.status(400).json({
-          error: new Error("Unauthorized request!"),
-        })
-      }
-      console.log("on est la")
       const filename = sauce.imageUrl.split("/images/")[1]
       fs.unlink(`images/${filename}`, () => {
         Sauce.deleteOne({ _id: req.params.id })
