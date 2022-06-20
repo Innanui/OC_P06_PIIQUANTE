@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt")
 const User = require("../models/user")
 const jwt = require("jsonwebtoken")
+const { masterKey } = require("../config")
 
 exports.signup = (req, res, next) => {
   User.findOne({ email: req.body.email })
@@ -44,7 +45,7 @@ exports.login = (req, res, next) => {
           }
           res.status(200).json({
             userId: user._id,
-            token: jwt.sign({ userId: user._id }, "RANDOM_TOKEN_SECRET", {
+            token: jwt.sign({ userId: user._id }, masterKey, {
               expiresIn: "24h",
             }),
           })
