@@ -1,6 +1,6 @@
 const express = require("express")
 const mongoose = require("mongoose")
-
+const rateLimit = require("express-rate-limit")
 const userRoutes = require("./routes/user")
 const sauceRoutes = require("./routes/sauce")
 const path = require("path")
@@ -29,6 +29,15 @@ app.use((req, res, next) => {
 })
 
 app.use(express.json())
+
+// app.use(
+//   rateLimit({
+//     windowMs: 12 * 60 * 60 * 1000, // 12 hour duration in milliseconds
+//     max: 5,
+//     message: "You exceeded 100 requests in 12 hour limit!",
+//     headers: true,
+//   })
+// )
 
 app.use("/images", express.static(path.join(__dirname, "images")))
 app.use("/api/auth", userRoutes)
