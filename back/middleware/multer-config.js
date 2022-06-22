@@ -17,4 +17,7 @@ const storage = multer.diskStorage({
   },
 })
 
-module.exports = multer({ storage: storage }).single("image")
+module.exports = multer({
+  storage: storage,
+  limits: { fileSize: 24000000 },
+}).single("image") //limit of 3Mega Octet = 24000000 bytes to file size
