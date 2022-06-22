@@ -2,6 +2,7 @@ const bcrypt = require("bcrypt")
 const User = require("../models/user")
 const jwt = require("jsonwebtoken")
 const validator = require("validator")
+const { masterKey } = require("../config")
 
 exports.signup = (req, res, next) => {
   // Validates input length and email
@@ -59,7 +60,7 @@ exports.login = (req, res, next) => {
           }
           res.status(200).json({
             userId: user._id,
-            token: jwt.sign({ userId: user._id }, "RANDOM_TOKEN_SECRET", {
+            token: jwt.sign({ userId: user._id }, masterKey, {
               expiresIn: "24h",
             }),
           })

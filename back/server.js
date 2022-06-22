@@ -1,5 +1,9 @@
 const http = require("http")
 const app = require("./app")
+const { masterKey } = require("./config.js")
+const { env_port } = require("./config.js")
+
+console.log("your code is" + `${masterKey}`)
 
 const normalizePort = (val) => {
   const port = parseInt(val, 10)
@@ -12,7 +16,7 @@ const normalizePort = (val) => {
   }
   return false
 }
-const port = normalizePort(process.env.PORT || "3000")
+const port = normalizePort(env_port || "3000")
 app.set("port", port)
 
 const errorHandler = (error) => {
