@@ -1,5 +1,6 @@
 const Sauce = require("../models/sauce")
 const fs = require("fs")
+const validator = require("validator")
 
 /**
  * Checks and updates tables according likeCode received and returns object containing new tables and numbers to increment to likes and dislikes
@@ -85,6 +86,19 @@ exports.createSauce = (req, res, next) => {
       error: new Error("Invalid request!"),
     })
   }
+  if (
+    // validates presence and length of sauce elements
+    !(
+      validator.isLength(sauceObject.name, { min: 1, max: 20 }) &&
+      validator.isLength(sauceObject.manufacturer, { min: 1, max: 20 }) &&
+      validator.isLength(sauceObject.description, { min: 1, max: 50 }) &&
+      validator.isLength(sauceObject.mainPepper, { min: 1, max: 20 }) &&
+      validator.isInt(sauceObject.heat.toString(), { min: 1, max: 10 })
+    )
+  ) {
+    res.status(401).json({ message: "Invalid request!" })
+  }
+
   const sauce = new Sauce({
     ...sauceObject,
     imageUrl: `${req.protocol}://${req.get("host")}/images/${
@@ -131,6 +145,22 @@ exports.updateSauce = (req, res, next) => {
         }`,
       }
     : { ...req.body }
+
+  if (
+    // validates presence and length of sauce elements
+    !(
+      validator.isLength(sauceObject.name, { min: 1, max: 20 }) &&
+      validator.isLength(sauceObject.manufacturer, { min: 1, max: 20 }) &&
+      validator.isLength(sauceObject.description, { min: 1, max: 50 }) &&
+      validator.isLength(sauceObject.mainPepper, { min: 1, max: 20 }) &&
+      validator.isInt(sauceObject.heat.toString(), { min: 1, max: 10 })
+    )
+  ) {
+    res.status(401).json({
+      error: new Error("Invalid request!"),
+    })
+  }
+
   Sauce.updateOne(
     { _id: req.params.id },
     { ...sauceObject, _id: req.params.id }
@@ -161,9 +191,17 @@ exports.deleteSauce = (req, res, next) => {
 exports.likeSauce = (req, res, next) => {
   const userId = req.body.userId
   const like = req.body.like
+  if (
+    // validates that like is 1, 0 or -1
+    !validator.isInt(like.toString(), { min: -1, max: 1 })
+  ) {
+    res.status(401).json({
+      error: new Error("Invalid request!"),
+    })
+  }
+
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
-      //delete sauce._id
       let likesObject = manageLikes(
         like,
         userId,

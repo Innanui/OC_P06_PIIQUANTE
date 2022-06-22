@@ -1,15 +1,30 @@
 const bcrypt = require("bcrypt")
 const User = require("../models/user")
 const jwt = require("jsonwebtoken")
+const validator = require("validator")
 
 exports.signup = (req, res, next) => {
+  // Validates input length and email
+  if (
+    !(
+      validator.isEmail(req.body.email) &&
+      validator.isLength(req.body.email, { min: 1, max: 20 }) &&
+      validator.isLength(req.body.password, { min: 1, max: 20 })
+    )
+  ) {
+    res.status(401).json({
+      error: new Error("Invalid request!"),
+    })
+  }
+  //checks if user already has an account
   User.findOne({ email: req.body.email })
     .then((user) => {
       if (user) {
-        return res
-          .status(401)
-          .json({ error: "Adresse email deja liée à un compte utilisateur !" })
+        return res.status(401).json({
+          error: "Adresse email deja liée à un compte utilisateur !",
+        })
       } else {
+        //crypts user password and save user in database
         bcrypt
           .hash(req.body.password, 10)
           .then((hash) => {
