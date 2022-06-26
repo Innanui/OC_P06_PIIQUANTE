@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken")
 const { masterKey } = require("../config.js")
 
+//gives access to req.auth : decoded userId from req headers to be used in controllers to check user good authentification
 module.exports = (req, res, next) => {
   try {
     const token = req.headers.authorization.split(" ")[1]

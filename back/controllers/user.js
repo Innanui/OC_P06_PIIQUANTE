@@ -5,7 +5,7 @@ const validator = require("validator")
 const { masterKey } = require("../config")
 
 exports.signup = (req, res, next) => {
-  // Validates input length and email
+  // Validates input data (length and email type)
   if (
     !(
       validator.isEmail(req.body.email) &&
@@ -53,7 +53,7 @@ exports.login = (req, res, next) => {
         return res.status(401).json({ error: "Utilisateur non trouvé !" })
       }
       bcrypt
-        .compare(req.body.password, user.password)
+        .compare(req.body.password, user.password) //req.body.password has already been verified by middleware auth (it has been compared with authorization header)
         .then((valid) => {
           if (!valid) {
             return res.status(401).json({ error: "Mot de passe incorrect !" })

@@ -1,3 +1,5 @@
+// configuration for environment variables
+
 const dotenv = require("dotenv")
 dotenv.config()
 

@@ -7,6 +7,7 @@ const path = require("path")
 
 const app = express()
 
+//connexion to database MongoDB
 mongoose
   .connect(
     "mongodb+srv://delphwolff:Tehau2020!!@cluster0.nafd7.mongodb.net/?retryWrites=true&w=majority",
@@ -15,6 +16,7 @@ mongoose
   .then(() => console.log("Connexion à MongoDB réussie !"))
   .catch(() => console.log("Connexion à MongoDB échouée !"))
 
+//Headers set up
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*")
   res.setHeader(
@@ -30,6 +32,7 @@ app.use((req, res, next) => {
 
 app.use(express.json())
 
+//limits number of API requests per IP adress per period of time
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)

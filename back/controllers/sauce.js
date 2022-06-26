@@ -99,20 +99,34 @@ exports.createSauce = (req, res, next) => {
     res.status(401).json({ message: "Invalid request!" })
   }
 
-  const sauce = new Sauce({
-    ...sauceObject,
-    imageUrl: `${req.protocol}://${req.get("host")}/images/${
-      req.file.filename
-    }`,
-    likes: 0,
-    dislikes: 0,
-    usersLiked: [],
-    usersDisliked: [],
-  })
-  sauce
-    .save()
-    .then(() => res.status(201).json({ message: "Sauce enregistrée !" }))
-    .catch((error) => res.status(400).json({ error }))
+  if (req.file) {
+    const sauce = new Sauce({
+      ...sauceObject,
+      imageUrl: `${req.protocol}://${req.get("host")}/images/${
+        req.file.filename
+      }`,
+      likes: 0,
+      dislikes: 0,
+      usersLiked: [],
+      usersDisliked: [],
+    })
+    sauce
+      .save()
+      .then(() => res.status(201).json({ message: "Sauce enregistrée !" }))
+      .catch((error) => res.status(400).json({ error }))
+  } else {
+    const sauce = new Sauce({
+      ...sauceObject,
+      likes: 0,
+      dislikes: 0,
+      usersLiked: [],
+      usersDisliked: [],
+    })
+    sauce
+      .save()
+      .then(() => res.status(201).json({ message: "Sauce enregistrée !" }))
+      .catch((error) => res.status(400).json({ error }))
+  }
 }
 
 exports.getAllSauces = (req, res, next) => {
