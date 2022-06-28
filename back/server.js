@@ -3,8 +3,6 @@ const app = require("./app")
 const { masterKey } = require("./config.js")
 const { env_port } = require("./config.js")
 
-console.log("your code is" + `${masterKey}`)
-
 const normalizePort = (val) => {
   const port = parseInt(val, 10)
 

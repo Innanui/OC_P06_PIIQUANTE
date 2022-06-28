@@ -7,10 +7,10 @@ const path = require("path")
 
 const app = express()
 
-//connexion to database MongoDB
+//connexion to MongoDB database
 mongoose
   .connect(
-    "mongodb+srv://delphwolff:Tehau2020!!@cluster0.nafd7.mongodb.net/?retryWrites=true&w=majority",
+    "mongodb+srv://delphwolff:glWPTUvuI0Saowui@cluster0.nafd7.mongodb.net/?retryWrites=true&w=majority",
     { useNewUrlParser: true, useUnifiedTopology: true }
   )
   .then(() => console.log("Connexion à MongoDB réussie !"))
@@ -42,7 +42,6 @@ const apiLimiter = rateLimit({
 
 // Apply the rate limiting middleware to API calls only
 app.use("/api", apiLimiter)
-
 app.use("/images", express.static(path.join(__dirname, "images")))
 app.use("/api/auth", userRoutes)
 app.use("/api/sauces", sauceRoutes)

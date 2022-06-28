@@ -1,6 +1,5 @@
 const Sauce = require("../models/sauce")
 const fs = require("fs")
-const validator = require("validator")
 
 /**
  * Checks and updates tables according likeCode received and returns object containing new tables and numbers to increment to likes and dislikes
@@ -78,7 +77,10 @@ const manageLikes = (likeCode, userId, usersLiked, usersDisliked) => {
   }
 }
 
+//Creates new sauce with or without an image
 exports.createSauce = (req, res, next) => {
+  console.log(`ceci est le message du controllers`)
+  console.log(req.body)
   const sauceObject = JSON.parse(req.body.sauce)
   delete sauceObject._id
   if (sauceObject.userId != req.auth.userId) {
@@ -86,19 +88,6 @@ exports.createSauce = (req, res, next) => {
       error: new Error("Invalid request!"),
     })
   }
-  if (
-    // validates presence and length of sauce elements
-    !(
-      validator.isLength(sauceObject.name, { min: 1, max: 20 }) &&
-      validator.isLength(sauceObject.manufacturer, { min: 1, max: 20 }) &&
-      validator.isLength(sauceObject.description, { min: 1, max: 50 }) &&
-      validator.isLength(sauceObject.mainPepper, { min: 1, max: 20 }) &&
-      validator.isInt(sauceObject.heat.toString(), { min: 1, max: 10 })
-    )
-  ) {
-    res.status(401).json({ message: "Invalid request!" })
-  }
-
   if (req.file) {
     const sauce = new Sauce({
       ...sauceObject,
@@ -129,12 +118,14 @@ exports.createSauce = (req, res, next) => {
   }
 }
 
+//retrieves all sauces in database
 exports.getAllSauces = (req, res, next) => {
   Sauce.find()
     .then((sauces) => res.status(200).json(sauces))
     .catch((error) => res.status(400).json({ error }))
 }
 
+//retrieves one sauce in database using its id
 exports.getOneSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
@@ -143,6 +134,7 @@ exports.getOneSauce = (req, res, next) => {
     .catch((error) => res.status(404).json({ error }))
 }
 
+//Modifies one sauce, updating image or not depending request
 exports.updateSauce = (req, res, next) => {
   if (req.file) {
     if (JSON.parse(req.body.sauce).userId != req.auth.userId) {
@@ -160,21 +152,6 @@ exports.updateSauce = (req, res, next) => {
       }
     : { ...req.body }
 
-  if (
-    // validates presence and length of sauce elements
-    !(
-      validator.isLength(sauceObject.name, { min: 1, max: 20 }) &&
-      validator.isLength(sauceObject.manufacturer, { min: 1, max: 20 }) &&
-      validator.isLength(sauceObject.description, { min: 1, max: 50 }) &&
-      validator.isLength(sauceObject.mainPepper, { min: 1, max: 20 }) &&
-      validator.isInt(sauceObject.heat.toString(), { min: 1, max: 10 })
-    )
-  ) {
-    res.status(401).json({
-      error: new Error("Invalid request!"),
-    })
-  }
-
   Sauce.updateOne(
     { _id: req.params.id },
     { ...sauceObject, _id: req.params.id }
@@ -183,6 +160,7 @@ exports.updateSauce = (req, res, next) => {
     .catch((error) => res.status(400).json({ error }))
 }
 
+//Deletes one sauce from database and deletes sauce image
 exports.deleteSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id, userId: req.auth.userId })
 
@@ -202,6 +180,7 @@ exports.deleteSauce = (req, res, next) => {
     .catch((error) => res.status(500).json({ error }))
 }
 
+//Updates number of likes/dislikes and userId like/dislike tables for one sauce according to req
 exports.likeSauce = (req, res, next) => {
   const userId = req.body.userId
   const like = req.body.like
@@ -217,6 +196,7 @@ exports.likeSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
       let likesObject = manageLikes(
+        // function returning an object to use to update sauce's attributes
         like,
         userId,
         sauce.usersLiked,

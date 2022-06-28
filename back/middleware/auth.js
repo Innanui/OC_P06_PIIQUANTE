@@ -9,7 +9,7 @@ module.exports = (req, res, next) => {
     const userId = decodedToken.userId
     req.auth = { userId }
     if (req.body.userId && req.body.userId !== userId) {
-      throw "Invalid user ID"
+      throw "Invalid user ID" // blocks requests having a userId in body and not corresponding to header authorization token
     } else {
       next()
     }
